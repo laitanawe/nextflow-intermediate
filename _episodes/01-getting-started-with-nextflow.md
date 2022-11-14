@@ -1,7 +1,7 @@
 ---
 title: "Getting Started with Nextflow"
-teaching: 30
-exercises: 10
+teaching: 60
+exercises: 40
 questions:
 - "What is a workflow and what are workflow management systems?"
 - "Why should I use a workflow management system?"
@@ -53,6 +53,11 @@ Key features include;
 * **Reproducibility**: The use of software management systems and a pipeline specification means that the workflow will produce the same results when re-run, including on different computing platforms.
 * **Reentrancy**: Continuous checkpoints allow workflows to resume
 from the last successfully executed steps.
+
+Nextflow DSL2 is a major revision of the Nextflow DSL:
+- Pipeline modularisation
+- Component reuse
+- Fluent definition of recurrent implementation patterns
 
 ## Nextflow basic concepts
 
@@ -169,12 +174,12 @@ followed by a single line comment.
 1. A Nextflow `process` block named `NUM_LINES`, which defines what the process does.
 1. An `input` definition block that assigns the input to the variable `read`, and declares that it should be interpreted as a file `path`.
 1. An `output` definition block that uses the Linux/Unix standard output stream `stdout` from the script block.
-1. A `script` block that contains the bash commands ` printf '${read}` to print the name of the read file, and ` gunzip -c ${read} | wc -l` to count the number of lines in the gzipped read file.
+1. A `script` block that contains the bash commands `printf '${read}'` to print the name of the read file, and `cat '${read}' | wc -l` to count the number of lines in the read file.
 
 ~~~
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 /*  Comments are uninterpreted text included with the script.
     They are useful for describing complex parts of the workflow
@@ -188,7 +193,7 @@ nextflow.enable.dsl=2
 
 /*  Workflow parameters are written as params.<parameter>
     and can be initialised using the `=` operator. */
-params.input = "data/yeast/reads/ref1_1.fq.gz"
+params.input = "data/ggal/ref1.fa"
 
 //  The default workflow
 workflow {
@@ -220,14 +225,54 @@ process NUM_LINES {
     script:
     /* Triple quote syntax """, Triple-single-quoted strings may span multiple lines. The content of the string can cross line boundaries without the need to split the string in several pieces and without concatenation or newline escape characters. */
     """
-    printf '${read} '
-    gunzip -c ${read} | wc -l
+    printf '${read}'
+    echo
+    cat '${read}' | wc -l
     """
 }
 ~~~~
 {: .language-groovy}
 
 To run a Nextflow script use the command `nextflow run <script_name>`.
+
+To change the input value from the command line, use `nextflow run wc.nf --input '/path/to/input/file'`
+
+When using the script block, `$` interpolates a Nextflow variable but you can use `\$` to interpolate a bash variable as seen in the code below.
+
+~~~
+#!/usr/bin/env nextflow
+
+nextflow.enable.dsl = 2
+
+params.input = "data/ggal/ref1.fa"
+
+workflow {
+
+    input_ch = Channel.fromPath(params.input)
+
+    NUM_LINES(input_ch)
+
+    NUM_LINES.out.view()
+}
+
+process NUM_LINES {
+
+    input:
+    path read
+
+    output:
+    stdout
+
+    script:
+    """
+    printf '${read}'
+    echo
+    mycnt=\$(cat ${read} | wc -l)
+    echo Number of lines: \$mycnt
+    """
+}
+~~~~
+{: .language-groovy}
 
 > ## Run a Nextflow  script
 > Run the script by entering the following command in your terminal:
@@ -240,30 +285,30 @@ To run a Nextflow script use the command `nextflow run <script_name>`.
 > > You should see output similar to the text shown below:
 > >
 > > ~~~
-> > N E X T F L O W  ~  version 20.10.0
-> > Launching `wc.nf` [fervent_babbage] - revision: c54a707593
+> > N E X T F L O W  ~  version 22.10.1
+> > Launching `wc.nf` [trusting_noether] DSL2 - revision: 7db69c20af
 > > executor >  local (1)
-> > [21/b259be] process > NUM_LINES (1) [100%] 1 of 1 ✔
-> >
-> >  ref1_1.fq.gz 58708
+> > [e0/9f2212] process > NUM_LINES (1) [100%] 1 of 1 ✔
+> > ref1.fa
+> > Number of lines: 2852
 > > ~~~
 > > {: .output}
 > >
 > > 1. The first line shows the Nextflow version number.
-> > 1. The second line shows the run name `fervent_babbage` (adjective and scientist name) and revision id `c54a707593`.
+> > 1. The second line shows the run name `trusting_noether` (adjective and scientist name) and revision id `c54a707593`.
 > > 1. The third line tells you the process has been executed locally (`executor >  local`).
-> > 1. The next line shows the process id `21/b259be`, process name, number of cpus, percentage task completion, and how many instances of the process have been run.
+> > 1. The next line shows the process id `e0/9f2212`, process name, number of cpus, percentage task completion, and how many instances of the process have been run.
 > > 1. The final line is the output of the `view` operator.
 > {: .solution}
 {: .challenge}
 
 
 > ## Process identification
-> The hexadecimal numbers, like 61/1f3ef4, identify the unique process execution.
+> The hexadecimal numbers, like e0/9f2212, identify the unique process execution.
 > These numbers are also the prefix of the directories where each process is executed.
 > You can inspect the files produced by changing to the directory `$PWD/work` and
-> using these numbers to find the process-specific execution path. We will learn how exactly 
-> nextflow using *work* directory to execute processes in the following sections. 
+> using these numbers to find the process-specific execution path. We will learn how exactly
+> nextflow uses the *work* directory to execute processes in later sections.
 {: .callout}
 
 

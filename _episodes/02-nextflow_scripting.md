@@ -1,7 +1,7 @@
 ---
 title: "Nextflow scripting"
-teaching: 30
-exercises: 5
+teaching: 40
+exercises: 20
 questions:
 - "What language are Nextflow scripts written in?"
 - "How do I store values in a Nextflow script?"
@@ -31,21 +31,6 @@ keypoints:
 
 Nextflow is a Domain Specific Language (DSL) implemented on top of the Groovy programming language, which in turn is a super-set of the Java programming language. This means that Nextflow can run any Groovy and Java code. It is not necessary to learn Groovy to use Nextflow DSL but it can be useful in edge cases where you need more functionality than the DSL provides.
 
-> ## Nextflow console
->  Nextflow has a console graphical interface. The  console is a REPL (read-eval-print loop) environment that allows a user to quickly test part of a script or pieces of Nextflow code in an interactive manner.
->
-> It is a handy tool that allows a user to evaluate fragments of Nextflow/Groovy code or fast prototype a complete pipeline script. More information can be found [here](https://www.nextflow.io/blog/2015/introducing-nextflow-console.html)
->
-> We can use the command `nextflow console` to launch the interactive console to test out out Groovy code.
->
-> ~~~
-> nextflow console
-> ~~~
-> {: .language-bash }
-> ### Console global scope
-> It is worth noting that the global script context is maintained across script executions. This means that variables declared in the global script scope are not lost when the script run is complete, and they can be accessed in further executions of the same or another piece of code.
-{: .callout }
-
 ## Language Basics
 
 ### Printing values
@@ -53,30 +38,30 @@ Nextflow is a Domain Specific Language (DSL) implemented on top of the Groovy pr
 To print something is as easy as using the `println` method (`println` is a compression of "print line") and passing the text to print in quotes.
 The text is referred to as a `string` as in a string of characters.
 ~~~
-println("Hello, World!")
+println("Our script works!")
 ~~~
 {: .language-groovy }
 
 ~~~
-Hello, World!
+Our script works!
 ~~~
 {: .output }
 
 **Parenthesis** for function invocations are optional. Therefore also the following is a valid syntax.
 
 ~~~
-println "Hello, World!"
+println "Our script works without parenthesis!"
 ~~~
 {: .language-groovy }
 
 ~~~
-Hello, World!
+Our script works without parenthesis!
 ~~~
 {: .output }
 
 ## Methods
 
-`println` is a example of a Groovy method. A method is just a block of code which only runs when it is called.
+`println` is an example of a Groovy method. A method is just a block of code which only runs when it is called.
 You can pass data, known as parameters, into a method using the method name followed by brackets `()`.
 Methods are used to perform certain actions, and they are also known as functions.
 Methods enable us to reuse code: define the code once, and use it many times.
@@ -231,12 +216,48 @@ To use a variable inside a single or multi-line double quoted string `""`  prefi
 
 ~~~
 chr = "1"
+
+//When using your variable within double quotes, you must prefix the $ for your variable to interpolate
 println("processing chromosome $chr")
+
+//You don't need the $ prefix before chr because it's unquoted when concatinating as seen below:              
+println("processing chromosome " + chr)
+
+The examples below highlight how to interpolate in Nextflow:
+
+var_int = 17
+
+//No $ prefix but there is interpolation:
+println(var_int)
+
+//Double Quotes, No $, No Interpolation:
+println("var_int")
+
+//Double Quotes, $ Interpolation:
+println("$var_int")
+
+//Double Quotes, ${} Interpolation:
+println("${var_int}")
+
+//Double Quotes, No $, No Interpolation:
+println("{var_int}")
+
+//Single Quotes, ${} but No Interpolation:
+println('${var_int}')
+
 ~~~
 {: .language-groovy }
 
 ~~~
 processing chromosome 1
+
+17
+var_int
+17
+17
+{var_int}
+${var_int}
+
 ~~~
 {: .output }
 
@@ -244,7 +265,9 @@ processing chromosome 1
 
 ~~~
 chr = "1"
+//Your variable will not interpolate when used within single quotes
 println('processing chromosome $chr')
+
 ~~~
 {: .language-groovy }
 
@@ -252,6 +275,82 @@ println('processing chromosome $chr')
 processing chromosome $chr
 ~~~
 {: .output }
+
+### String interpolation within the script block
+
+In the script block, to use a nextflow variable inside a single or multi-line double quoted string `""` prefix the variable name with a `$` to show it should be interpolated.
+
+<b>NOTE: a.) Within script block</b>:
+`$` is <b>mandatory for interpolation within the script block and `""` or `''` is optional when you prefix a Nextflow variable with `$` in the script block</b>. <b>Even when using `$` within a bash `#` comment</b> in the script block, you must use `\$` in order to treat the `$` as part of the comment.
+
+<b>NOTE: b.) Outside the script block</b>:
+Outside the script block and in the Nextflow scope (<i>any area that is not within the script block</i>), `""` is required if you want to interpolate a Nextflow variable using a `$` prefix. Also, in the Nextflow scope, use a Nextflow variable name within the arguments of a groovy function/operator if there's no `""` i.e. you don't need a `$` prefix for interpolation in that case.
+
+~~~
+#!/usr/bin/env nextflow
+
+nextflow.enable.dsl = 2
+
+process testme {
+
+input:
+ val mystr
+
+output:
+ stdout
+
+script:
+ """
+ #The examples below highlight how to interpolate in the script block:
+
+ echo mystr #No \$ prefix, and there is No interpolation.
+
+ echo "mystr" #Double Quotes, No \$, No Interpolation.
+
+ echo "$mystr" #Double Quotes, \$ Interpolation.
+
+ echo "${mystr}" #Double Quotes, \${} Interpolation.
+
+ echo "{mystr}" #Double Quotes, No \$, No Interpolation.
+
+ echo '${mystr}' #Single Quotes, \${} but there is Interpolation.
+
+ echo '$mystr' #Single Quotes, \$ but there is Interpolation.
+
+ echo ${mystr} #No Quotes, \${} but there is Interpolation.
+
+ """
+}
+
+workflow {
+
+any_var_name = "Our Script Works!"
+params.input = Channel.from(any_var_name)
+testme(params.input)
+testme.out.view()
+
+}
+
+~~~
+{: .language-groovy }
+
+~~~
+
+executor >  local (1)
+[86/2f14f5] process > testme (1) [100%] 1 of 1 ✔
+mystr
+mystr
+Our Script Works!
+Our Script Works!
+{mystr}
+Our Script Works!
+Our Script Works!
+Our Script Works!
+
+~~~
+{: .output }
+
+**Note:** Variable names inside single quoted strings do not support String interpolation.
 
 ## Lists
 
@@ -280,15 +379,35 @@ println(kmers[0])
 We can use negative numbers as indices in Groovy. They count from the end of the list rather than the front: the index `-1` gives us the last element in the list, `-2` the second to last, and so on. Because of this, `kmers[3]` and `kmers[-1]` point to the same element in our example list.
 
 ~~~
+#!/usr/bin/env nextflow
 kmers = [11,21,27,31]
 //Lists can also be indexed with negative indexes
 println(kmers[3])
 println(kmers[-1])
+
+println("The last element of kmers is: " + kmers[3])
+
+println("The last element of kmers is: $kmers[-1]")
+
+println("The last element of kmers is: " + kmers[0..2])
+
+println("The last element of kmers is: ${kmers[-1]}")
+
+println("The second-to-the-last element of kmers is: ${kmers[-2]}")
+
 ~~~
 {: .language-groovy }
 ~~~
+N E X T F L O W  ~  version 22.10.1
+Launching `script5.nf` [grave_hodgkin] DSL2 - revision: 249ba9a9f4
 31
 31
+The last element of kmers is: 31
+The last element of kmers is: [11, 21, 27, 31][-1]
+The last element of kmers is: [11, 21, 27]
+The last element of kmers is: 31
+The second-to-the-last element of kmers is: 27
+
 ~~~
 {: .output}
 
@@ -298,7 +417,8 @@ To define a range use `<num1>..<num2>` notation.
 ~~~
 kmers = [11,21,27,31]
 // The first three elements using a range.
-println(kmer[0..2])
+println(kmers[0..2])
+// Because kmers is a list, this will print the first three elements of the kmers list
 ~~~
 {: .language-groovy }
 ~~~
@@ -308,20 +428,21 @@ println(kmer[0..2])
 
 ### String interpolation of list elements
 
-To use an expression like `kmer[0..2]` inside a double quoted String `""` we use the `${expression}` syntax, similar to Bash shell scripts.
+To use an expression like `kmer[0..2]` inside a double-quoted string `""`, we use the `${expression}` syntax, similar to Bash shell scripts.
 
 For example, the expression below without the `{}`""
 
 ~~~
 kmers = [11,21,27,31]
-println("The first three elements in the Lists are. $kmers[0..2]")
+println("The first three elements in the Lists are: $kmers[0..2]")
+// Because $kmers is a list, this will print the kmers list, followed by [0..2]
 ~~~
 {: .language-groovy }
 
 would output.
 
 ~~~
-The first three elements in the Lists are. [11, 21, 27, 31][0..2]
+The first three elements in the Lists are: [11, 21, 27, 31][0..2]
 ~~~
 {: .output}
 
@@ -329,13 +450,13 @@ We need to enclose the `kmers[0..2]` expression inside `${}` as below to get the
 
 ~~~
 kmers = [11,21,27,31]
-println("The first three elements in the Lists are. ${kmers[0..2]}")
+println("The first three elements in the Lists are: ${kmers[0..2]}")
 ~~~
 {: .language-groovy }
 
 
 ~~~
-The first three elements in the Lists are. [11, 21, 27]
+The first three elements in the Lists are: [11, 21, 27]
 ~~~
 {: .output}
 
@@ -352,26 +473,39 @@ mylist = [0,1,2]
 println(mylist.size())
 
 //inside a string need we need to use the ${} syntax
-println("list size is:  ${mylist.size()}")
+println("list size is: ${mylist.size()}")
+
+// When there's no double quotes, you can use this:
+println("list size is: " + mylist.size())
+
 ~~~
 {: .language-groovy }
 
 ~~~
 3
-list size is:  3
+list size is: 3
 ~~~
 {: .output }
 
 We can use the `get` method items to retrieve items in a list.
 
 ~~~
-mylist = [0,1,2]
+mylist = [100,150,200]
 println mylist.get(1)
+
+println "${mylist.get(1)}"
+
+println(mylist.get(1))
+
+println("${mylist.get(1)}")
+
 ~~~
 {: .language-groovy }
 
 ~~~
-1
+150
+150
+150
 ~~~
 {: .output }
 
@@ -433,296 +567,6 @@ println mylist.findAll{it%2 == 0}
 > {: .solution}
 {: .challenge}
 
-
-## Maps
-
-It can difficult to remember the index of a value in a list, so we can use Groovy Maps (also known as associative arrays) that have an arbitrary type of key instead of an integer value. The syntax is very similar to Lists. To specify the key use a colon before the value `[key:value]`. Multiple values are separated by a comma. *Note:* the key value is not enclosed in quotes.
-
-~~~                
-roi = [ chromosome : "chr17", start: 7640755, end: 7718054, genes: ['ATP1B2','TP53','WRAP53']]
-~~~
-{: .language-groovy }
-
-
-Maps can be accessed in a conventional square-bracket syntax or as if the key was a property of the map or using the dot notation. *Note:* When retrieving a value the key value is  enclosed in quotes.
-
-~~~
-//Use of the square brackets.
-println(roi['chromosome'])
-
-//Use a dot notation            
-println(roi.start)
-
-//Use of get method                      
-println(roi.get('genes'))          
-~~~
-{: .language-groovy }
-
-To add data or to modify a map, the syntax is similar to adding values to list:
-
-~~~
-//Use of the square brackets
-roi['chromosome'] = '17'
-
-//Use a dot notation        
-roi.chromosome = 'chr17'  
-
-//Use of put method              
-roi.put('genome', 'hg38')  
-~~~
-{: .language-groovy }
-
-More information about maps can be found in the [Groovy API](http://docs.groovy-lang.org/latest/html/groovy-jdk/java/util/Map.html).
-
-
-## Closures
-
-Closures are the swiss army knife of Nextflow/Groovy programming. In a nutshell a closure is a block of code that can be passed as an argument to a function. This can be useful to create a re-usable function.
-
-We can assign a closure to a variable in same way as a value using the `=`.
-
-~~~
-square = { it * it }
-~~~
-{: .language-groovy }
-
-
-The curly brackets `{}` around the expression `it * it` tells the script interpreter to treat this expression as code. `it` is an implicit variable that is provided in closures. It's available when the closure doesn't have an explicitly declared parameter and represents the value that is passed to the function when it is invoked.
-
-We can pass the function `square` as an argument to other functions or methods. Some built-in functions take a function like this as an argument. One example is the `collect` method on lists that iterates through each element of the list transforming it into a new value using the closure:
-
-~~~
-square = { it * it }
-x = [ 1, 2, 3, 4 ]
-y = x.collect(square)
-println y
-~~~
-{: .language-groovy }
-
-~~~
-[ 1, 4, 9, 16 ]
-~~~
-{: .output }
-
-A closure can also be defined in an anonymous manner, meaning that it is not given a name, and is defined in the place where it needs to be used.
-
-~~~
-x = [ 1, 2, 3, 4 ]
-y = x.collect({ it * it })
-println("x is $x")
-println("y is $y")
-~~~
-{: .language-groovy }
-
-~~~
-x is [1, 2, 3, 4]
-y is [1, 4, 9, 16]
-~~~
-{: .output }
-
-### Closure parameters
-
-By default, closures take a single parameter called `it`. To define a different name use the
-` variable ->` syntax.
-
-For example:
-
-~~~
-square = { num -> num * num }
-~~~
-{: .language-groovy }
-
-In the above example the variable `num` is assigned as the closure input parameter instead of `it`.
-
-> ## Write a closure
-> Write a closure to add the prefix `chr` to each element of  the list `x=[1,2,3,4,5,6]`
-> > ## Solution
-> > ~~~
-> > prefix = { "chr${it}"}
-> > x = [ 1,2,3,4,5,6 ].collect(prefix)
-> > println x
-> > ~~~
-> > {: .language-groovy}
-> > ~~~
-> > [chr1, chr2, chr3, chr4, chr5, chr6]
-> > ~~~
-> > {: .output}
-> {: .solution}
-{: .challenge}
-
-### Multiple map parameters
-
-It’s also possible to define closures with multiple, custom-named parameters using the `->` syntax. This separate the custom-named parameters by a comma before the `->` operator.
-
-
-For example:
-
-~~~
-tp53 = [chromosome: "chr17",start:7661779 ,end:7687538, genome:'GRCh38', gene: "TP53"]
-//perform subtraction of end and start coordinates
-region_length = {start,end -> end-start }
-tp53.length = region_length(tp53.start,tp53.end)
-println(tp53)
-~~~
-{: .language-groovy }
-
-Would add the region `length` to the map `tp53`, calculated as `end - start`.
-
-~~~
-[chromosome:chr17, start:7661779, end:7687538, genome:GRCh38, gene:TP53, length:25759]
-~~~
-{: .output }
-
-
-For another example, the method `each()` when applied to a `map` can take a closure with two arguments, to which it passes the *key-value* pair for each entry in the map object:
-
-~~~
-//closure with two parameters
-printMap = { a, b -> println "$a with value $b" }
-
-//map object
-my_map = [ chromosome : "chr17", start : 1, end : 83257441 ]
-
-//each iterates through each element
-my_map.each(printMap)
-~~~
-{: .language-groovy }
-
-
-~~~
-chromosome with value chr17
-start with value 1
-end with value 83257441
-~~~
-{: .output }
-
-
-Learn more about closures in the [Groovy documentation](http://groovy-lang.org/closures.html).
-
-
-# Additional Material
-
-## Conditional Execution
-
-## If statement
-
-One of the most important features of any programming language is the ability to execute different code under different conditions. The simplest way to do this is to use the if construct.
-
-The if statement uses the syntax common to other programming languages such Java, C, JavaScript, etc.
-
-~~~
-if( < boolean expression > ) {
-    // true branch
-}
-else {
-    // false branch
-}
-~~~
-{: .language-groovy }
-
-
-The else branch is optional. Curly brackets are optional when the branch defines just a single statement.
-
-~~~
-x = 12
-if( x > 10 )
-    println "$x is greater than 10"
-~~~
-{: .language-groovy }
-
-
-*null*, *empty strings* and *empty collections* are evaluated to false.
-Therefore a statement like:
-
-~~~
-list = [1,2,3]
-if( list != null && list.size() > 0 ) {
-  println list
-}
-else {
-  println 'The list is empty'
-}
-~~~
-{: .language-groovy }
-
-
-Can be written as:
-
-~~~
-if( list )
-    println list
-else
-    println 'The list is empty'
-~~~
-{: .language-groovy }
-
-
-In some cases can be useful to replace `if` statement with a ternary expression, also known as a conditional expression. For example:
-
-~~~
-println list ? list : 'The list is empty'
-~~~
-{: .language-groovy }
-
-
-The previous statement can be further simplified using the Elvis operator `?:` as shown below:
-
-~~~
-println list ?: 'The list is empty'
-~~~
-{: .language-groovy }
-
-
-## For statement
-
-The classical for loop syntax is supported as shown here:
-
-~~~
-for (int i = 0; i <3; i++) {
-   println("Hello World $i")
-}
-~~~
-{: .language-groovy }
-
-
-Iteration over list objects is also possible using the syntax below:
-
-~~~
-list = ['a','b','c']
-
-for( String elem : list ) {
-  println elem
-}
-~~~
-{: .language-groovy }
-
-
-## Functions
-
-It is possible to define a custom function into a script, as shown here:
-
-~~~
-int fib(int n) {
-    return n < 2 ? 1 : fib(n-1) + fib(n-2)
-}
-
-println (fib(10)) // prints 89
-~~~
-{: .language-groovy }
-
-
-- A function can take multiple arguments separated by commas. 
-- The `return` keyword can be omitted and the function implicitly returns the value of the last evaluated expression. (Not recommended)
-- Explicit types can be omitted. (Not recommended):
-
-~~~
-def fact( n ) {
-  n > 1 ? n * fact(n-1) : 1
-}
-
-println (fact(5)) // prints 120
-~~~
-{: .language-groovy }
 
 ## More resources
 
