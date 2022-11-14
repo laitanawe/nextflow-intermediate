@@ -74,7 +74,10 @@ main:
   quant( index.out, read_pairs_ch )
 
 emit:
-  fastqc.out.mix( quant.out ).collect()
+  index_result = index.out
+  fastqc_result = fastqc.out
+  quant_result =  quant.out
+  all_result = fastqc.out | mix(quant.out) | collect
 }
 
 
@@ -164,7 +167,7 @@ read_pairs_flat_ch.view()
      */
 
     rnaseq_sub( params.transcriptome, read_pairs_ch )
-    multiqc( rnaseq_sub.out )
+    multiqc( rnaseq_sub.out.all_result )
 
 }
 
