@@ -83,7 +83,7 @@ This can be confusing for people familiar with the `#` syntax for commenting in 
 ~~~
 {: .language-groovy }
 
-
+items
 ## Variables
 
 In any programming language, you need to use variables to store different types of information. A variable is a pointer to a space in the computer's memory that stores the value associated with it.
@@ -211,6 +211,7 @@ ATP1B2\TP53\WRAP53
 {: .output }
 
 ### String interpolation
+**Note:** You can save the following Nextflow script as strings.nf
 
 To use a variable inside a single or multi-line double quoted string `""`  prefix the variable name with a `$` to show it should be interpolated:
 
@@ -223,7 +224,7 @@ println("processing chromosome $chr")
 //You don't need the $ prefix before chr because it's unquoted when concatinating as seen below:              
 println("processing chromosome " + chr)
 
-The examples below highlight how to interpolate in Nextflow:
+//The examples below highlight how to interpolate in Nextflow:
 
 var_int = 17
 
@@ -286,12 +287,17 @@ In the script block, to use a nextflow variable inside a single or multi-line do
 <b>NOTE: b.) Outside the script block</b>:
 Outside the script block and in the Nextflow scope (<i>any area that is not within the script block</i>), `""` is required if you want to interpolate a Nextflow variable using a `$` prefix. Also, in the Nextflow scope, use a Nextflow variable name within the arguments of a groovy function/operator if there's no `""` i.e. you don't need a `$` prefix for interpolation in that case.
 
+**Note:** You can save the following Nextflow script as strings_script.nf
+
 ~~~
 #!/usr/bin/env nextflow
 
 nextflow.enable.dsl = 2
 
 process testme {
+
+// process directives should go here. You can specify a different container for each process in your workflow.
+// container '/path/to/container/image.sif'
 
 input:
  val mystr
@@ -318,6 +324,8 @@ script:
  echo '$mystr' #Single Quotes, \$ but there is Interpolation.
 
  echo ${mystr} #No Quotes, \${} but there is Interpolation.
+
+ echo $mystr #No Quotes, \$ but there is Interpolation.
 
  """
 }
@@ -346,16 +354,105 @@ Our Script Works!
 Our Script Works!
 Our Script Works!
 Our Script Works!
+Our Script Works!
 
 ~~~
 {: .output }
 
 **Note:** Variable names inside single quoted strings do not support String interpolation.
 
+## Process Directives
+**Note:** You can save the following Nextflow script as directives.nf
+
+~~~
+#!/usr/bin/env nextflow
+
+nextflow.enable.dsl = 2
+
+/*  Comments are uninterpreted text included with the script.
+    They are useful for describing complex parts of the workflow
+    or providing useful information such as workflow usage.
+
+    Usage:
+       nextflow run wc.nf --input <input_file>
+
+    Multi-line comments start with a slash asterisk /* and finish with an asterisk slash. */
+//  Single line comments start with a double slash // and finish on the same line
+
+/*  Workflow parameters are written as params.<parameter>
+    and can be initialised using the `=` operator. */
+params.input = "data/ggal/ref1.fa"
+
+//  The default workflow
+
+workflow {
+
+    //  Input data is received through channels
+    input_ch = Channel.fromPath(params.input)
+
+    /*  The script to execute is called by its process name,
+        and input is provided between brackets. */
+    NUM_LINES(input_ch)
+
+    /*  Process output is accessed using the `out` channel.
+        The channel operator view() is used to print
+        process output to the terminal. */
+    NUM_LINES.out.view()
+}
+
+/*  A Nextflow process block
+    Process names are written, by convention, in uppercase.
+    This convention is used to enhance workflow readability. */
+process NUM_LINES {
+
+    // directives like cpus, memory can go here:
+    cpus 2 // cpus, memory and time are a task objects and will eventually be accessed as task.cpus, task.memory, task.time respectively
+    memory '2 GB'
+    time '1h'
+    // each process often has a different container:
+    // container 'biocontainer/bar'
+
+    input:
+    path read
+
+    output:
+    stdout
+
+    script:
+    /* Triple quote syntax """, Triple-single-quoted strings may span multiple lines. The content of the string can cross line boundaries. */
+    """
+    printf '${read}'
+    echo
+    mycnt=\$(cat '${read}' | wc -l)
+    echo Number of lines: \$mycnt and Number of cpus: $task.cpus
+
+    echo my_script -m $task.memory -n $task.cpus -t $task.time
+    """
+}
+
+~~~
+{: .language-groovy }
+
+~~~
+
+N E X T F L O W  ~  version 22.10.1
+Launching `wc.nf` [festering_mcclintock] DSL2 - revision: 5c81d9b499
+executor >  local (1)
+[0f/bb3762] process > NUM_LINES (1) [100%] 1 of 1 ✔
+ref1.fa
+Number of lines: 2852 and Number of cpus: 2
+my_script -m 2 GB -n 2 -t 1h
+
+~~~
+{: .output }
+
+
 ## Lists
+**Note:** You can save the following Nextflow script as lists.nf
 
 To store multiple values in a variable we can use a List.
 A List  (also known as array) object can be defined by placing the list items in square brackets and separating items by commas `,`:
+
 
 ~~~
 kmers = [11,21,27,31]
@@ -366,6 +463,8 @@ You can access a given item in the list with square-bracket notation `[]`. These
 
 ~~~
 kmers = [11,21,27,31]
+
+// Print the first element of kmers
 println(kmers[0])
 
 ~~~
@@ -381,18 +480,24 @@ We can use negative numbers as indices in Groovy. They count from the end of the
 ~~~
 #!/usr/bin/env nextflow
 kmers = [11,21,27,31]
-//Lists can also be indexed with negative indexes
+
+// Print the fourth element of kmers
 println(kmers[3])
+
+//Last element (a list can be indexed with a negative number)
 println(kmers[-1])
 
 println("The last element of kmers is: " + kmers[3])
 
 println("The last element of kmers is: $kmers[-1]")
 
-println("The last element of kmers is: " + kmers[0..2])
+// Print a range of elements from first to 3rd element
+println("The first three element of kmers is: " + kmers[0..2])
 
+// An example of how to use the curly bracket notation
 println("The last element of kmers is: ${kmers[-1]}")
 
+// Print the second-to-the-last element of kmers
 println("The second-to-the-last element of kmers is: ${kmers[-2]}")
 
 ~~~
@@ -487,10 +592,12 @@ list size is: 3
 ~~~
 {: .output }
 
-We can use the `get` method items to retrieve items in a list.
+We can use the `get` method to retrieve items in a list.
 
 ~~~
 mylist = [100,150,200]
+
+// To retrieve the 2nd item of mylist, you can use any of the following:
 println mylist.get(1)
 
 println "${mylist.get(1)}"
@@ -513,20 +620,47 @@ Listed below are a few more common list methods and their output on a simple exa
 
 ~~~
 mylist = [1,2,3]
+
 println mylist
+
+// concatenate the item, [1] to the existing list
 println mylist + [1]
+
+// remove the item, [1] from the existing list
 println mylist - [1]
+
+//duplicate the existing list
 println mylist * 2
+
+//reverse the order of the items in the existing list
 println mylist.reverse()
+
+//add 3 to each item in the existing list
 println mylist.collect{ it+3 }
+
+//Print the size of the new list if each item is a unique value
 println mylist.unique().size()
+
+//Count the number of times that 1 occurs in the existing list
 println mylist.count(1)
+
+//Minimum value in the existing list
 println mylist.min()
+
+//Maximum value in the existing list
 println mylist.max()
+
+//Sum of the value of items in the existing list
 println mylist.sum()
+
+//Sort the existing list in ascending order
 println mylist.sort()
-println mylist.find{it%2 == 0}
+
+//Print all items that have a remainder 0 when divided by 2
 println mylist.findAll{it%2 == 0}
+
+//.find is a convenience wrapper for .findAll, .findQuery and .findById
+println mylist.find{it%2 == 0}
 ~~~
 {: .language-groovy }
 

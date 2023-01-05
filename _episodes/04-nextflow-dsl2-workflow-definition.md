@@ -1,5 +1,5 @@
 ---
-title: "Nextflow DSL Workflow Definition"
+title: "Nextflow DSL2 Workflow Definition"
 teaching: 50
 exercises: 10
 questions:
@@ -20,11 +20,13 @@ keypoints:
 
 We are now going to look at a sample Nextflow DSL2 workflow that performs some RNA-seq tasks.
 
-For the Nextflow course demo, you need to download some files to follow the lesson.
-1. Download <a href="https://laitanawe.github.io/nextflow-novice/data/nextflow-nov-lesson.tar.gz">nextflow-nov-lesson.tar.gz</a>
-2. Make a directory called "nfdemo" on the Desktop
-3. Move the nextflow-nov-lesson.tar.gz inside the nfdemo directory and cd into the nfdemo directory.
-4. Unzip/extract `nextflow-nov-lesson.tar.gz` by typing `tar -xzvf nextflow-nov-lesson.tar.gz`
+For the Nextflow course demo, you need to download some files to follow the lesson. You don't need to redo these steps if you already downloaded the demo files.
+1. Make a directory called "nfdemo" on the Desktop  and cd into the nfdemo directory.
+(To create the demo directory in your Desktop, you can use: `mkdir -pv ~/Desktop/nfdemo`)
+(To cd into the demo directory in your Desktop, you can use: `cd ~/Desktop/nfdemo`)
+2. To ensure that your present working directory is `~/Desktop/nfdemo`, you can use: `cd ~/Desktop/nfdemo`, then download <a href="https://laitanawe.github.io/nextflow-intermediate/data/nextflow-int-lesson.tar.gz">nextflow-int-lesson.tar.gz</a>
+(If wget is installed in your environment, use: `wget https://laitanawe.github.io/nextflow-intermediate/data/nextflow-int-lesson.tar.gz`)
+3. Unzip/extract `nextflow-nov-lesson.tar.gz` by typing `tar -xzvf nextflow-nov-lesson.tar.gz`
 You should end up certain files within the folder **`nfdemo/data/ggal`** on your Desktop.
 
 Open the file `main.nf` in the script directory with your favourite text editor.
@@ -103,9 +105,9 @@ outdir        : ${params.outdir}
     */
 
     include { index } from './modules/index' // './modules/some_module' //Cut and Paste index block into ./modules/index.nf
-    include { quant } from './modules/quant' // './modules/other_module' //Cut and Paste index block into ./modules/quant.nf
-    include { fastqc } from './modules/fastqc' // './modules/another_more_module' //Cut and Paste index block into ./modules/fastqc.nf
-    include { multiqc } from './modules/multiqc' // './modules/one_more_module' //Cut and Paste index block into ./modules/multiqc.nf
+    include { quant } from './modules/quant' // './modules/other_module' //Cut and Paste quant block into ./modules/quant.nf
+    include { fastqc } from './modules/fastqc' // './modules/another_more_module' //Cut and Paste fastqc block into ./modules/fastqc.nf
+    include { multiqc } from './modules/multiqc' // './modules/one_more_module' //Cut and Paste multiqc block into ./modules/multiqc.nf
 
 //  The default workflow
 workflow {
@@ -158,16 +160,16 @@ To run a Nextflow script use the command `nextflow run <script_name>`.
 > > N E X T F L O W  ~  version 20.10.0
 > > Launching `main.nf` [sleepy_avogadro] DSL2 - revision: 83e5d597be
 > > RNASEQ NEXTFLOW PIPELINE uses the ffg bioinformatics tools: Salmon, FastQC, MultiQC
-> > transcriptome : /home/aweo/Desktop/nfdemo/data/ggal/ggal_1_48850000_49020000.Ggal71.500bpflank.fa
-> > reads         : /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_{1,2}.fq
+> > transcriptome : /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_1_48850000_49020000.Ggal71.500bpflank.fa
+> > reads         : /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_{1,2}.fq
 > > outdir        : results
 > > executor >  local (4)
 > > [3b/a13c45] process > index (ggal_1_48850000_49020000) [100%] 1 of 1 ✔
 > > [ff/f60afe] process > fastqc (FASTQC on ggal_gut)      [100%] 1 of 1 ✔
 > > [34/84f09d] process > quant (1)                        [100%] 1 of 1 ✔
 > > [aa/25f8e4] process > multiqc                          [100%] 1 of 1 ✔
-> > [ggal_gut, [/home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]]
-> > [ggal_gut, /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]
+> > [ggal_gut, [/home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]]
+> > [ggal_gut, /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]
 > > ~~~
 > > {: .output}
 > >

@@ -1,9 +1,9 @@
 ---
-title: "Nextflow DSL2 Subworkflow Definition"
+title: "Nextflow DSL2 Subworkflows"
 teaching: 50
 exercises: 10
 questions:
-- "What are the main features of a subworkflowin Nextflow DSL2?"
+- "What are the main features of a subworkflow in Nextflow DSL2?"
 - "What are the main components of a subworkflow in Nextflow DSL2?"
 - "How do I run a subworkflow in Nextflow DSL2?"
 objectives:
@@ -20,11 +20,13 @@ keypoints:
 
 We are now going to look at a sample Nextflow script that performs some RNA-seq tasks.
 
-For the Nextflow course demo, you need to download some files to follow the lesson.
-1. Download <a href="https://laitanawe.github.io/nextflow-novice/data/nextflow-nov-lesson.tar.gz">nextflow-nov-lesson.tar.gz</a>
-2. Make a directory called "nfdemo" on the Desktop
-3. Move the nextflow-nov-lesson.tar.gz inside the nfdemo directory and cd into the nfdemo directory.
-4. Unzip/extract `nextflow-nov-lesson.tar.gz` by typing `tar -xzvf nextflow-nov-lesson.tar.gz`
+For the Nextflow course demo, you need to download some files to follow the lesson. You don't need to redo these steps if you already downloaded the demo files.
+1. Make a directory called "nfdemo" on the Desktop  and cd into the nfdemo directory.
+(To create the demo directory in your Desktop, you can use: `mkdir -pv ~/Desktop/nfdemo`)
+(To cd into the demo directory in your Desktop, you can use: `cd ~/Desktop/nfdemo`)
+2. To ensure that your present working directory is `~/Desktop/nfdemo`, you can use: `cd ~/Desktop/nfdemo`, then download <a href="https://laitanawe.github.io/nextflow-intermediate/data/nextflow-int-lesson.tar.gz">nextflow-int-lesson.tar.gz</a>
+(If wget is installed in your environment, use: `wget https://laitanawe.github.io/nextflow-intermediate/data/nextflow-int-lesson.tar.gz`)
+3. Unzip/extract `nextflow-nov-lesson.tar.gz` by typing `tar -xzvf nextflow-nov-lesson.tar.gz`
 You should end up certain files within the folder **`nfdemo/data/ggal`** on your Desktop.
 
 
@@ -57,9 +59,9 @@ This is a Nextflow subworkflow (./rnaseq_mods.nf) performing the following steps
 // Save your ./rnaseq_mods.nf script so that it looks like this:
 
     include { index } from './modules/index' // './modules/some_module' //Cut and Paste index block into ./modules/index.nf
-    include { quant } from './modules/quant' // './modules/other_module' //Cut and Paste index block into ./modules/quant.nf
-    include { fastqc } from './modules/fastqc' // './modules/another_more_module' //Cut and Paste index block into ./modules/fastqc.nf
-    include { multiqc } from './modules/multiqc' // './modules/one_more_module' //Cut and Paste index block into ./modules/multiqc.nf. You can also include as an alias e.g. include { multiqc as multiqc_rep } from './modules/multiqc'
+    include { quant } from './modules/quant' // './modules/other_module' //Cut and Paste quant block into ./modules/quant.nf
+    include { fastqc } from './modules/fastqc' // './modules/another_more_module' //Cut and Paste fastqc block into ./modules/fastqc.nf
+    include { multiqc } from './modules/multiqc' // './modules/one_more_module' //Cut and Paste multiqc block into ./modules/multiqc.nf. You can also include as an alias e.g. include { multiqc as multiqc_rep } from './modules/multiqc'
 
 //  The default subworkflow
 workflow rnaseq_sub {
@@ -76,10 +78,12 @@ main:                               // Specify the steps. Each step is typically
 emit:                               // Output(s) of the subworkflow.
   fastqc.out.mix( quant.out ).collect()
 }
+~~~~
+{: .language-groovy}
 
 
-// Copy from the shebang line to the end so that your main.nf script now looks like this:
-
+Copy from the shebang line to the end so that your `main.nf` script now looks like this:
+~~~~
 #!/usr/bin/env nextflow
 
 /* Contributors:
@@ -171,7 +175,7 @@ read_pairs_flat_ch.view()
 ~~~~
 {: .language-groovy}
 
-To run a Nextflow script use the command `nextflow run <script_name>`.
+To run your Nextflow script, use the command `nextflow run main.nf`.
 
 > ## Run a Nextflow  script
 > Run the script by entering the following command in your terminal:
@@ -187,16 +191,16 @@ To run a Nextflow script use the command `nextflow run <script_name>`.
 > > N E X T F L O W  ~  version 20.10.0
 > > Launching `main.nf` [sleepy_avogadro] DSL2 - revision: 83e5d597be
 > > RNASEQ NEXTFLOW PIPELINE uses the ffg bioinformatics tools: Salmon, FastQC, MultiQC
-> > transcriptome : /home/aweo/Desktop/nfdemo/data/ggal/ggal_1_48850000_49020000.Ggal71.500bpflank.fa
-> > reads         : /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_{1,2}.fq
+> > transcriptome : /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_1_48850000_49020000.Ggal71.500bpflank.fa
+> > reads         : /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_{1,2}.fq
 > > outdir        : results
 > > executor >  local (4)
 > > [51/a6b821] process > rnaseq_sub:index (ggal_1_48850000_49020000) [100%] 1 of 1 ✔
 > > [0c/1f6c84] process > rnaseq_sub:fastqc (FASTQC on ggal_gut)      [100%] 1 of 1 ✔
 > > [46/a7019e] process > rnaseq_sub:quant (1)                        [100%] 1 of 1 ✔
 > > [7c/2f055d] process > multiqc                                     [100%] 1 of 1 ✔
-> > [ggal_gut, [/home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]]
-> > [ggal_gut, /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/aweo/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]
+> > [ggal_gut, [/home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]]
+> > [ggal_gut, /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_1.fq, /home/hpc_user/Desktop/nfdemo/data/ggal/ggal_gut_2.fq]
 > > ~~~
 > > {: .output}
 > >
