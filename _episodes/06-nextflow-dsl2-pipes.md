@@ -24,7 +24,7 @@ For the Nextflow course demo, you need to download some files to follow the less
 1. Download <a href="https://laitanawe.github.io/nextflow-intermediate/data/nextflow-int-lesson.tar.gz">nextflow-int-lesson.tar.gz</a>
 2. Make a directory called "nfdemo" on the Desktop
 3. Move the nextflow-nov-lesson.tar.gz inside the nfdemo directory and cd into the nfdemo directory.
-4. Unzip/extract `nextflow-int-lesson.tar.gz` by typing `tar -xzf nextflow-int-lesson.tar.gz`
+4. Unzip/extract `nextflow-int-lesson.tar.gz` by typing `tar -xzvf nextflow-int-lesson.tar.gz`
 You should end up certain files within the folder **`nfdemo/data/ggal`** on your Desktop.
 
 
