@@ -866,6 +866,131 @@ end with value 83257441
 
 Learn more about closures in the [Groovy documentation](http://groovy-lang.org/closures.html).
 
+
+# Additional Material
+
+## Conditional Execution
+
+## If statement
+
+One of the most important features of any programming language is the ability to execute different code under different conditions. The simplest way to do this is to use the if construct.
+
+The if statement uses the syntax common to other programming languages such Java, C, JavaScript, etc.
+
+~~~
+if( < boolean expression > ) {
+    // true branch
+}
+else {
+    // false branch
+}
+~~~
+{: .language-groovy }
+
+
+The else branch is optional. Curly brackets are optional when the branch defines just a single statement.
+
+~~~
+x = 12
+if( x > 10 )
+    println "$x is greater than 10"
+~~~
+{: .language-groovy }
+
+
+*null*, *empty strings* and *empty collections* are evaluated to false.
+Therefore a statement like:
+
+~~~
+list = [1,2,3]
+if( list != null && list.size() > 0 ) {
+  println list
+}
+else {
+  println 'The list is empty'
+}
+~~~
+{: .language-groovy }
+
+
+Can be written as:
+
+~~~
+if( list )
+    println list
+else
+    println 'The list is empty'
+~~~
+{: .language-groovy }
+
+
+In some cases can be useful to replace `if` statement with a ternary expression, also known as a conditional expression. For example:
+
+~~~
+println list ? list : 'The list is empty'
+~~~
+{: .language-groovy }
+
+
+The previous statement can be further simplified using the Elvis operator `?:` as shown below:
+
+~~~
+println list ?: 'The list is empty'
+~~~
+{: .language-groovy }
+
+
+## For statement
+
+The classical for loop syntax is supported as shown here:
+
+~~~
+for (int i = 0; i <3; i++) {
+   println("Hello World $i")
+}
+~~~
+{: .language-groovy }
+
+
+Iteration over list objects is also possible using the syntax below:
+
+~~~
+list = ['a','b','c']
+
+for( String elem : list ) {
+  println elem
+}
+~~~
+{: .language-groovy }
+
+
+## Functions
+
+It is possible to define a custom function into a script, as shown here:
+
+~~~
+int fib(int n) {
+    return n < 2 ? 1 : fib(n-1) + fib(n-2)
+}
+
+println (fib(10)) // prints 89
+~~~
+{: .language-groovy }
+
+
+- A function can take multiple arguments separated by commas.
+- The `return` keyword can be omitted and the function implicitly returns the value of the last evaluated expression. (Not recommended)
+- Explicit types can be omitted. (Not recommended):
+
+~~~
+def fact( n ) {
+  n > 1 ? n * fact(n-1) : 1
+}
+
+println (fact(5)) // prints 120
+~~~
+{: .language-groovy }
+
 ## More resources
 
 The complete Groovy language documentation is available at this [link](http://groovy-lang.org/documentation.html#languagespecification).
