@@ -702,6 +702,47 @@ println mylist.find{it%2 == 0}
 {: .challenge}
 
 
+## Maps
+
+It can be difficult to remember the index of a value in a list, so we can use Groovy Maps (also known as associative arrays) that have an arbitrary type of key instead of an integer value. The syntax is very similar to Lists. To specify the key use a colon before the value `[key:value]`. Multiple values are separated by a comma. *Note:* the key value is not enclosed in quotes.
+
+~~~                
+roi = [ chromosome: "chr17", start: 7640755, end: 7718054, genes: ['ATP1B2','TP53','WRAP53']]
+~~~
+{: .language-groovy }
+
+
+Maps can be accessed in a conventional square-bracket syntax or as if the key was a property of the map or using the dot notation. *Note:* When retrieving a value the key value is enclosed in quotes.
+
+~~~
+//Use of the square brackets.
+println(roi['chromosome'])
+
+//Use a dot notation            
+println(roi.start)
+
+//Use of get method                      
+println(roi.get('genes'))          
+~~~
+{: .language-groovy }
+
+To add data or to modify a map, the syntax is similar to adding values to list:
+
+~~~
+//Use of the square brackets
+roi['chromosome'] = '17'
+
+//Use a dot notation        
+roi.chromosome = 'chr17'  
+
+//Use of put method              
+roi.put('genome', 'hg38')  
+~~~
+{: .language-groovy }
+
+More information about maps can be found in the [Groovy API](http://docs.groovy-lang.org/latest/html/groovy-jdk/java/util/Map.html).
+
+
 ## More resources
 
 The complete Groovy language documentation is available at this [link](http://groovy-lang.org/documentation.html#languagespecification).
