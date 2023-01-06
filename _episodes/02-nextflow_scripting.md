@@ -742,6 +742,129 @@ roi.put('genome', 'hg38')
 
 More information about maps can be found in the [Groovy API](http://docs.groovy-lang.org/latest/html/groovy-jdk/java/util/Map.html).
 
+## Closures
+
+Closures are the swiss army knife of Nextflow/Groovy programming. In a nutshell a closure is a block of code that can be passed as an argument to a function. This can be useful to create a re-usable function.
+
+We can assign a closure to a variable in same way as a value using the `=`.
+
+~~~
+square = { it * it }
+~~~
+{: .language-groovy }
+
+
+The curly brackets `{}` around the expression `it * it` tells the script interpreter to treat this expression as code. `it` is an implicit variable that is provided in closures. It's available when the closure doesn't have an explicitly declared parameter and represents the value that is passed to the function when it is invoked.
+
+We can pass the function `square` as an argument to other functions or methods. Some built-in functions take a function like this as an argument. One example is the `collect` method on lists that iterates through each element of the list transforming it into a new value using the closure:
+
+~~~
+square = { it * it }
+x = [ 1, 2, 3, 4 ]
+y = x.collect(square)
+println y
+~~~
+{: .language-groovy }
+
+~~~
+[ 1, 4, 9, 16 ]
+~~~
+{: .output }
+
+A closure can also be defined in an anonymous manner, meaning that it is not given a name, and is defined in the place where it needs to be used.
+
+~~~
+x = [ 1, 2, 3, 4 ]
+y = x.collect({ it * it })
+println("x is $x")
+println("y is $y")
+~~~
+{: .language-groovy }
+
+~~~
+x is [1, 2, 3, 4]
+y is [1, 4, 9, 16]
+~~~
+{: .output }
+
+### Closure parameters
+
+By default, closures take a single parameter called `it`. To define a different name use the
+` variable ->` syntax.
+
+For example:
+
+~~~
+square = { num -> num * num }
+~~~
+{: .language-groovy }
+
+In the above example the variable `num` is assigned as the closure input parameter instead of `it`.
+
+> ## Write a closure
+> Write a closure to add the prefix `chr` to each element of  the list `x=[1,2,3,4,5,6]`
+> > ## Solution
+> > ~~~
+> > prefix = { "chr${it}"}
+> > x = [ 1,2,3,4,5,6 ].collect(prefix)
+> > println x
+> > ~~~
+> > {: .language-groovy}
+> > ~~~
+> > [chr1, chr2, chr3, chr4, chr5, chr6]
+> > ~~~
+> > {: .output}
+> {: .solution}
+{: .challenge}
+
+### Multiple map parameters
+
+It’s also possible to define closures with multiple, custom-named parameters using the `->` syntax. This separate the custom-named parameters by a comma before the `->` operator.
+
+
+For example:
+
+~~~
+tp53 = [chromosome: "chr17",start:7661779 ,end:7687538, genome:'GRCh38', gene: "TP53"]
+//perform subtraction of end and start coordinates
+region_length = {start,end -> end-start }
+tp53.length = region_length(tp53.start,tp53.end)
+println(tp53)
+~~~
+{: .language-groovy }
+
+Would add the region `length` to the map `tp53`, calculated as `end - start`.
+
+~~~
+[chromosome:chr17, start:7661779, end:7687538, genome:GRCh38, gene:TP53, length:25759]
+~~~
+{: .output }
+
+
+For another example, the method `each()` when applied to a `map` can take a closure with two arguments, to which it passes the *key-value* pair for each entry in the map object:
+
+~~~
+//closure with two parameters
+printMap = { a, b -> println "$a with value $b" }
+
+//map object
+my_map = [ chromosome : "chr17", start : 1, end : 83257441 ]
+
+//each iterates through each element
+my_map.each(printMap)
+~~~
+{: .language-groovy }
+
+
+~~~
+chromosome with value chr17
+start with value 1
+end with value 83257441
+~~~
+{: .output }
+
+
+Learn more about closures in the [Groovy documentation](http://groovy-lang.org/closures.html).
 
 ## More resources
 
