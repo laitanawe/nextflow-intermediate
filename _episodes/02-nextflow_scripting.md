@@ -863,15 +863,11 @@ end with value 83257441
 ~~~
 {: .output }
 
-
 Learn more about closures in the [Groovy documentation](http://groovy-lang.org/closures.html).
 
-
 # Additional Material
-
 ## Conditional Execution
-
-## If statement
+### If statement
 
 One of the most important features of any programming language is the ability to execute different code under different conditions. The simplest way to do this is to use the if construct.
 
@@ -939,8 +935,7 @@ println list ?: 'The list is empty'
 ~~~
 {: .language-groovy }
 
-
-## For statement
+### For statement
 
 The classical for loop syntax is supported as shown here:
 
@@ -962,7 +957,6 @@ for( String elem : list ) {
 }
 ~~~
 {: .language-groovy }
-
 
 ## Functions
 
