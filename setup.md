@@ -59,6 +59,8 @@ You should end up certain files within the folder **`nfdemo/data/ggal`** on your
 
 `cd ~/opt/nextflow`
 
+`export NXF_EDGE=1`
+
 `curl -s https://get.nextflow.io | bash`
 
 `mkdir -pv ~/bin`
@@ -66,6 +68,8 @@ You should end up certain files within the folder **`nfdemo/data/ggal`** on your
 `ln -sv "$PWD/nextflow" ~/bin/nextflow`
 
 `~/opt/nextflow/nextflow self-update`
+
+`nextflow info`
 
 `export PATH="$HOME/opt/nextflow:$PATH"`
 
