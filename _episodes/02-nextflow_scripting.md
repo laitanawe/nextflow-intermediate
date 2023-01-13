@@ -919,7 +919,9 @@ else
 {: .language-groovy }
 
 
-In some cases can be useful to replace `if` statement with a ternary expression, also known as a conditional expression. For example:
+In some cases, it can be useful to replace `if` statement with a ternary expression, also known as a conditional expression.
+Ternary operator in Groovy is used as a replacement of if-then-else statement. It simulates this behavior - If expression 1 is true, variable = expression2 else variable = expression3. It is the only operator in Groovy that takes three arguments.
+For example:
 
 ~~~
 println list ? list : 'The list is empty'
