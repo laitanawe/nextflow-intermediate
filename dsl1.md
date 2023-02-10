@@ -36,6 +36,8 @@ You should end up certain files within the folder **`nfdemo/data/ggal`** on your
 
 `mkdir -pv ~/bin`
 
+`mv -fv ~/bin/java ~/bin/java2`
+
 `ln -sfv ~/opt/java1/bin/* ~/bin/`
 
 ## If not in $PATH, add this to bottom of ~/.bashrc, then exit and reload your $PATH:
