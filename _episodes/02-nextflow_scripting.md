@@ -362,7 +362,7 @@ Our Script Works!
 
 ### String interpolation within the shell block
 
-In Nextflow, the shell block is an alternative to the script block. However, Nextflow variables follow the syntax `!{variable_name}` in order for variable interpolation to occur. Anything prefixed with a `$` will then be interpolated as a bash variable.
+In Nextflow, the shell block is an alternative to the script block. However, Nextflow variables follow the syntax `!{variable_name}` in order for variable interpolation to occur in the shell block. Also, in the shell block, anything prefixed with a `$` will be interpolated as a bash variable.
 
 **Note:** You can save the following Nextflow script as strings_shell.nf
 
