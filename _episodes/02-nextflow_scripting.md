@@ -360,6 +360,55 @@ Our Script Works!
 
 **Note:** Variable names inside single quoted strings do not support String interpolation.
 
+### String interpolation within the shell block
+
+In Nextflow, the shell block is an alternative to the script block. However, Nextflow variables follow the syntax `!{variable_name}` in order for variable interpolation to occur. Anything prefixed with a `$` will then be interpolated as a bash variable.
+
+**Note:** You can save the following Nextflow script as strings_shell.nf
+
+~~~
+#!/usr/bin/env nextflow
+
+nextflow.enable.dsl = 2
+
+process testme {
+
+// process directives should go here. You can specify a different container for each process in your workflow.
+// container '/path/to/container/image.sif'
+
+input:
+ val mystr
+
+output:
+ stdout
+
+shell:
+ """
+ echo !{mystr}
+ """
+}
+
+workflow {
+
+any_var_name = "Our Script Works!"
+params.input = Channel.from(any_var_name)
+testme(params.input)
+testme.out.view()
+
+}
+
+~~~
+{: .language-groovy }
+
+~~~
+
+executor >  local (1)
+[86/2f14f5] process > testme (1) [100%] 1 of 1 ✔
+Our Script Works!
+
+~~~
+{: .output }
+
 ## Process Directives
 **Note:** You can save the following Nextflow script as directives.nf
 
