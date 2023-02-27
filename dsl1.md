@@ -56,7 +56,7 @@ You should end up certain files within the folder **`nfdemo/data/ggal`** on your
 
 `export NXF_VER=20.04.1`
 
-`curl -fsSL get.nextflow.io | bash`
+`curl -s https://get.nextflow.io | bash`
 
 `mkdir -pv ~/bin`
 
