@@ -23,16 +23,16 @@ You should end up certain files within the folder **`nfdemo/data/ggal`** on your
 
 `base_url=https://enos.itcollege.ee/~jpoial/allalaadimised/jdk8`
 
-`wget --continue --no-check-certificate $base_url/jdk-8u341-linux-x64.tar.gz`
+`wget --continue --no-check-certificate $base_url/jdk-8u361-linux-x64.tar.gz`
 
 ## Unpack and put links to the executables in a common directory in your $PATH::
-`tar -xzf jdk-8u341-linux-x64.tar.gz`
+`tar -xzf jdk-8u361-linux-x64.tar.gz`
 
-`rm -v jdk-8u341-linux-x64.tar.gz*`
+`rm -v jdk-8u361-linux-x64.tar.gz*`
 
-`mv -fv jdk1.8.0_341/* .`
+`mv -fv jdk1.8.0_361/* .`
 
-`rmdir jdk1.8.0_341`
+`rmdir jdk1.8.0_361`
 
 `mkdir -pv ~/bin`
 
